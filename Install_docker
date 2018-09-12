@@ -1,0 +1,25 @@
+#!/bin/sh
+
+#setup repository
+
+sudo apt update
+sudo apt upgrade
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo apt-key fingerprint 0EBFCD88
+
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+#install docker
+
+#update repo
+sudo apt update
+#check fetch to docker.com
+apt-cache policy docker-ce
+
+sudo apt-get install -y docker-ce
+#check status
+sudo systemctl status docker
+
+#looking for docker.service active
