@@ -1,35 +1,74 @@
 #!/usr/bin/env python2
 import os
 
-IP = raw_input('Please enter IP address (format x.x.x.x): ')
-subnet = raw_input('Please enter subnet address (format x.x.x.x): ')
-gateway = raw_input('Please enter gateway address (format x.x.x.x): ')
-DNS = raw_input('Please enter DNS address (format x.x.x.x X.X.X.X): ')
-domain = raw_input('Please enter DNS domain: ')
+class Global():
+    #Global addresses
+    IP = ''
+    subnet = ''
+    gateway = ''
+    DNS = ''
+    domain = ''
+
+def validateAddresses():
+    #obtain and validate addresses
+    check = ''
+    valid = False
+
+    while not valid:
+        if check.lower() == 'n' or check.lower() == '':
+            #change Global addresses
+            Global.IP = raw_input('\nPlease enter IP address (format x.x.x.x): ')
+            Global.subnet = raw_input('\nPlease enter subnet address (format x.x.x.x): ')
+            Global.gateway = raw_input('\nPlease enter gateway address (format x.x.x.x): ')
+            Global.DNS = raw_input('\nPlease enter DNS address (format x.x.x.x X.X.X.X): ')
+            Global.domain = raw_input('\nPlease enter DNS domain: ')
+
+            #verify changes
+            print('------------------------------' +
+                '\nIP address: '+ Global.IP +
+                '\nSubnet: '+ Global.subnet +
+                '\nGateway: ' + Global.gateway +
+                '\nDNS: ' + Global.DNS +
+                '\nDomain: ' + Global.domain)
+            check = raw_input('\nIs this correct? (y/n) : ')
+
+        #proceed to file creation
+        elif check.lower() == 'y':
+            print('\nCreating new interfaces file')
+            valid = True
+
+        else: #loop till valid answer
+            print('\nThis is not a valid entry, try again.')
+            check = raw_input('Is this correct? (y/n) : ')
+
 
 def interfaceFile():
+    #store usable contents in array
     content = []
-    with open("/etc/network/interfaces", "r") as oldFile:
+    with open("/etc/network/interfaces", "r") as oldFile: #open file
         for line in oldFile:
-            if line.startswith('iface eth0 inet'):
+            if line.startswith('iface eth0 inet'): #find location of changes
                 line = line.strip()
                 content.append(line)
                 break
             content.append(line.rstrip('\n'))
 
-    with open("/etc/network/Static_Interfaces", "a") as file:
-        for x in content:
+    with open("/etc/network/Static_Interfaces", "a") as file: #create new file
+        for x in content: #add old contents
             file.write(x + '\n')
-        file.write('address ' + IP + '\n')
-        file.write('netmask ' + subnet + '\n')
-        file.write('gateway ' + gateway + '\n')
-        file.write('dns-nameservers ' + DNS + '\n')
-        file.write('dns-domain ' + domain)
+        file.write('\naddress ' + Global.IP + #add global addresses
+                '\nnetmask ' + Global.subnet +
+                '\ngateway ' + Global.gateway +
+                '\ndns-nameservers ' + Global.DNS +
+                '\ndns-domain ' + Global.domain)
 
-def renameFiles():
+def renameFiles(): #change original file name and make new file the original
     os.system('mv /etc/network/interfaces /etc/network/origin_interfaces')
     os.system('mv /etc/network/Static_Interfaces /etc/network/interfaces')
 
+def main()
+    validateAddresses()
+    interfaceFile()
+    renameFiles()
 
-interfaceFile()
-renameFiles()
+main()
