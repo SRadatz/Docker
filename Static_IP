@@ -33,18 +33,3 @@ def renameFiles():
 
 interfaceFile()
 renameFiles()
-
-
-
-
-
-
-
-
-
-
-#open interface file
-#file = open("/etc/network/interfaces", 'r+b')
-#read contents
-#file_contents = file.read()
-#file.seek(0)
