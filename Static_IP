@@ -1,0 +1,50 @@
+#!/usr/bin/env python2
+import os
+
+IP = raw_input('Please enter IP address (format x.x.x.x): ')
+subnet = raw_input('Please enter subnet address (format x.x.x.x): ')
+gateway = raw_input('Please enter gateway address (format x.x.x.x): ')
+DNS = raw_input('Please enter DNS address (format x.x.x.x X.X.X.X): ')
+domain = raw_input('Please enter DNS domain: ')
+
+def interfaceFile():
+    content = []
+    with open("/etc/network/interfaces", "r") as oldFile:
+        for line in oldFile:
+            if line.startswith('iface eth0 inet'):
+                line = line.strip()
+                content.append(line)
+                break
+            content.append(line.rstrip('\n'))
+
+    with open("/etc/network/Static_Interfaces", "a") as file:
+        for x in content:
+            file.write(x + '\n')
+        file.write('address ' + IP + '\n')
+        file.write('netmask ' + subnet + '\n')
+        file.write('gateway ' + gateway + '\n')
+        file.write('dns-nameservers ' + DNS + '\n')
+        file.write('dns-domain ' + domain)
+
+def renameFiles():
+    os.system('mv /etc/network/interfaces /etc/network/origin_interfaces')
+    os.system('mv /etc/network/Static_Interfaces /etc/network/interfaces')
+
+
+interfaceFile()
+renameFiles()
+
+
+
+
+
+
+
+
+
+
+#open interface file
+#file = open("/etc/network/interfaces", 'r+b')
+#read contents
+#file_contents = file.read()
+#file.seek(0)
