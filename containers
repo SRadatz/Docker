@@ -1,0 +1,66 @@
+#!/bin/sh
+#docker run -d --restart=unless-stopped \
+#  -p 80:80 -p 443:443 \
+#  -v /host/certs:/container/certs \
+#  -e SSL_CERT_DIR="/container/certs" \
+#  rancher/rancher:latest
+
+mkdir /Media
+mkdir /Media/Movies
+mkdir /Media/Music
+mkdir /Media/tvShows
+
+sudo docker rm transmission
+sudo docker rm rancher
+sudo docker rm rancher-agent
+sudo docker rm couchPotato
+
+
+sudo docker ps -a
+
+docker run -d --name=rancher
+  --restart=unless-stopped \
+  -p 80:80 -p 443:443 \
+#  -e HTTP_PROXY="http://192.168.1.200:3128" \
+#  -e HTTPS_PROXY="http://192.168.1.200:3128" \
+  -e NO_PROXY="localhost" \
+  rancher/rancher:latest
+
+Sudo docker create --name=couchPotato -d \
+  --restart=unless-stopped \
+  -v /couchPotato:/config \
+  -v /couchPotato:/downloads \
+  -v /couchPotato:/movies \
+  -p 5050:5050 linuxserver/couchpotato
+
+Sudo docker create --name=plex -d \
+  --restart=unless-stopped \
+  --net=host \
+  -e VERSION=latest \
+  -v /plex:/config \
+  -v /plex:/downloads \
+  -v /plex:/movies linuxserver/plex
+
+docker create --name=sickrage -d \
+  -v /sickrage:/config \
+  -v /sickrage:/downloads \
+  -v /sickrage:/tv \
+#  -e PGID=<gid> -e PUID=<uid>  \
+  -p 8081:8081 \
+  linuxserver/sickrage
+
+#AFTER INSTALL of transmission
+#sudo docker stop transmission
+#settings.json
+#"rpc-authentication-required": true
+#"rpc-username": "transmission"
+#rpc-password
+#pass will convert it to a hash when you restart the container
+docker create --name=transmission \
+  -v /transmission:/config \
+  -v /transmission:/downloads \
+  -v /transmission:/watch \
+#  -e PGID=<gid> -e PUID=<uid> \
+  -p 9091:9091 -p 51413:51413 \
+  -p 51413:51413/udp \
+  linuxserver/transmission
