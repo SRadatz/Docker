@@ -1,5 +1,8 @@
 #!/bin/sh
 
+#uninstall old version
+#sudo apt-get remove docker docker-engine docker.io
+
 #setup repository
 
 sudo apt update -y
@@ -8,8 +11,13 @@ echo ****************UPDATE COMPLETE****************
 sudo apt upgrade -y
 echo ****************UPGRADE COMPLETE****************
 
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 echo ****************CURL COMPLETE****************
+
+#if ca certificate issue
+#sudo apt-get install --reinstall ca-certificates
 
 sudo apt-key fingerprint 0EBFCD88
 echo ****************KEY ADDED****************
@@ -25,7 +33,7 @@ echo ****************UPDATE COMPLETE****************
 apt-cache policy docker-ce
 echo ****************CACHE COMPLETE****************
 
-sudo apt-get install -y docker-ce
+sudo apt install -y docker-ce
 echo ****************INSTALL COMPLETE****************
 
 #check status
